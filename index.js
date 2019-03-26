@@ -1,15 +1,20 @@
 'use strict';
 const fs = require('fs');
-
 const program = require('commander');
-const chalk = require('chalk');
-const inquirer = require('inquirer');
-
 const config = require('./config');
 
+const {
+  debug,
+  error,
+  success,
+  warning
+} = require('./tools');
+
 const steps = [
-  'policies',
-  'server',
+  'which',
+  'properties',
+  'php',
+  'server'
 ];
 
 program
@@ -18,13 +23,8 @@ program
   .option('--disable-ssl', 'Disable SSL', null, false)
   .parse(process.argv);
 
-const debug = (message) => console.log(chalk.blue(message));
-const warning = (message) => console.log(chalk.yellow(message));
-const success = (message) => console.log(chalk.green(message));
-const error = (message) => console.log(chalk.red(message));
-
-steps.forEach(async file => {
-  fs.lstat(`./modules/${file}.js`, (err, stats) => {
+steps.forEach(file => {
+  fs.lstat(`./modules/${file}.js`, async (err, stats) => {
     if(err)
       return error(err);
 
@@ -38,10 +38,10 @@ steps.forEach(async file => {
     if (stats.isFile()) {
       const m = require(`./modules/${file}`);
 
-      m(config, program).then(res => {
+      await m(config, program).then(res => {
         success(res);
-      }).catch(err => {
-        error(`[ERROR] ${err}`);
+      }).catch(e => {
+        error(`[ERROR] ${e}`);
         process.exit(1);
       });
     } else {
