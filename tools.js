@@ -14,5 +14,5 @@ module.exports = {
   success,
   error,
   info,
-  header
+  header,
 };

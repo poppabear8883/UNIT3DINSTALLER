@@ -1,5 +1,4 @@
-const {spawn} = require('child_process');
-const _ = require('lodash');
+const spawn = require('await-spawn');
 
 const {
   debug,
@@ -7,18 +6,26 @@ const {
   success,
   warning,
   info,
-  header
+  header,
 } = require('../tools');
 
 module.exports = (config, program) => {
   header('PHP Module');
-  return new Promise(async (resolve, reject) => {
-    info('Checking PHP Version ...');
-    const child = spawn('php', ['-v']);
 
-    await child.on('error', err => {
-      warning('PHP was not found. Attempting to install ...');
-      const php = spawn('apt-get', [
+  info('Checking PHP Version ...');
+
+  return new Promise((resolve, reject) => {
+    spawn('add-apt-repository', [
+      '-y',
+      'ppa:nginx/development',
+      'ppa:ondrej/php',
+      'ppa:certbot/certbot',
+    ]).then(data => {
+      if (program.debug) {
+        debug(data);
+      }
+
+      spawn('apt-get', [
         'install',
         'debconf-utils',
         'php-pear',
@@ -30,50 +37,45 @@ module.exports = (config, program) => {
         'php7.3-mysql',
         'php7.3-xml',
         'php7.3-fpm',
-        'php7.3-intl'
-      ]);
-
-      php.on('error', phperr => {
-        return reject(phperr);
-      });
-
-      php.stderr.on('data', data => {
-        return reject(data.toString());
-      });
-
-      php.stdout.on('data', data => {
+        'php7.3-intl',
+      ]).then(data0 => {
         if (program.debug) {
-          debug(data.toString());
+          debug(data0);
         }
+
+        spawn('php', ['-v']).then(data1 => {
+          const min = config.min_php_version.split('.');
+          const ver = data1.substr(3, 9).split('.');
+
+          if (program.debug) {
+            debug(`[DEBUG] data: ${data1}`);
+            debug(`[DEBUG] min_php_version: ${config.min_php_version}`);
+            debug(`[DEBUG] Version: ${data1.substr(3, 9)}`);
+          }
+
+          if (
+            ver[0] < min[0] ||
+            ver[1] < min[1] ||
+            ver[2] < min[2]
+          ) {
+            error('4');
+            return reject(`The PHP version on your system is not compatible. Min PHP Version ${config.min_php_version}`);
+          }
+
+          return resolve(data1);
+        }).catch(err => {
+          error('1');
+          return reject(err.stderr);
+        });
+
+      }).catch(err => {
+        error('2');
+        return reject(err.stderr);
       });
 
-      php.on('exit', () => {
-        return resolve('PHP was successfully Installed');
-      });
+    }).catch(err => {
+      error('3');
+      return reject(err);
     });
-
-    child.stderr.on('data', data => {
-      return reject(data.toString());
-    });
-
-    child.stdout.on('data', data => {
-      data = data.toString();
-      const min = config.min_php_version.split('.');
-      const ver = data.substr(3, 9).split('.');
-
-      if (program.debug) {
-        debug(`[DEBUG] data: ${data}`);
-        debug(`[DEBUG] min_php_version: ${config.min_php_version}`);
-        debug(`[DEBUG] Version: ${data.substr(3, 9)}`);
-      }
-
-      if (
-        ver[0] < min[0] ||
-        ver[1] < min[1] ||
-        ver[2] < min[2]
-      ) return reject(`The PHP versions on your system is not compatible. Min PHP Version ${config.min_php_version}`);
-    });
-
-    return resolve('Completed');
   });
 };

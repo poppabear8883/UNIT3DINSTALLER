@@ -9,6 +9,7 @@
   "author": "Poppabear",
   "license": "MIT",
   "dependencies": {
+    "await-spawn": "^2.1.2",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
     "inquirer": "^6.2.2",

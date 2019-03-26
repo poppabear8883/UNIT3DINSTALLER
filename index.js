@@ -7,14 +7,14 @@ const {
   debug,
   error,
   success,
-  warning
+  warning,
 } = require('./tools');
 
 const steps = [
-  'which',
-  'properties',
+  //'which',
+  // 'properties',
   'php',
-  'server'
+  //'server',
 ];
 
 program
@@ -25,7 +25,7 @@ program
 
 steps.forEach(file => {
   fs.lstat(`./modules/${file}.js`, async (err, stats) => {
-    if(err)
+    if (err)
       return error(err);
 
     if (program.debug) {
@@ -38,12 +38,14 @@ steps.forEach(file => {
     if (stats.isFile()) {
       const m = require(`./modules/${file}`);
 
-      await m(config, program).then(res => {
-        success(res);
-      }).catch(e => {
-        error(`[ERROR] ${e}`);
-        process.exit(1);
-      });
+      m(config, program)
+        .then(data => {
+          success(data);
+        })
+        .catch(err => {
+          error(err);
+          process.exit(1);
+        });
     } else {
       error(`[ERROR] ./modules/${file}.js is not a known file!`);
       process.exit(1);

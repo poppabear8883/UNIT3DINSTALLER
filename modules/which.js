@@ -10,10 +10,10 @@ const {
   header
 } = require('../tools');
 
-module.exports = (config, program) => {
-  header('Checking if which is installed ...');
-
-  return new Promise(async (resolve, reject) => {
+module.exports = async (config, program) => {
+  header('Which');
+  info('Checking if which is installed on your system ...');
+  return new Promise((resolve, reject) => {
     const child = spawn('which', ['which']);
 
     child.on('error', err => {

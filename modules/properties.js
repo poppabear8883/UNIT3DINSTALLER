@@ -7,8 +7,8 @@ const {
   header
 } = require('../tools');
 
-module.exports = (config, program) => {
-  return new Promise(async (resolve, reject) => {
+module.exports = async (config, program) => {
+  return new Promise((resolve, reject) => {
     header('Config Properties');
 
     /* repository */

@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const spawn = require('child_process');
 const {
   debug,
   error,
@@ -6,8 +6,6 @@ const {
   warning
 } = require('../tools');
 
-module.exports = (config, program) => {
-  return new Promise((resolve, reject) => {
-    return resolve('Server Settings have been stored!');
-  });
+module.exports = async (config, program) => {
+  return Promise.resolve('Server Settings have been stored!');
 };
