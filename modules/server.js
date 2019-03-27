@@ -1,11 +1,5 @@
-const spawn = require('child_process');
-const {
-  debug,
-  error,
-  success,
-  warning
-} = require('../tools');
+const io = require('../tools');
 
-module.exports = async (config, program) => {
-  return Promise.resolve('Server Settings have been stored!');
+module.exports = (config, program) => {
+  io.success('Server Settings have been stored!');
 };

@@ -3,18 +3,13 @@ const fs = require('fs');
 const program = require('commander');
 const config = require('./config');
 
-const {
-  debug,
-  error,
-  success,
-  warning,
-} = require('./tools');
+const io = require('./tools');
 
 const steps = [
-  //'which',
-  // 'properties',
+  'properties',
+  'repositories',
   'php',
-  //'server',
+  'server'
 ];
 
 program
@@ -24,30 +19,15 @@ program
   .parse(process.argv);
 
 steps.forEach(file => {
-  fs.lstat(`./modules/${file}.js`, async (err, stats) => {
+  fs.lstat(`./modules/${file}.js`, (err, stats) => {
     if (err)
-      return error(err);
-
-    if (program.debug) {
-      debug(`[DEBUG] ${file}.js`);
-      debug(`[DEBUG] Is file: ${stats.isFile()}`);
-      debug(`[DEBUG] Is directory: ${stats.isDirectory()}`);
-      debug(`[DEBUG] Is symbolic link: ${stats.isSymbolicLink()}`);
-    }
+      return io.error(err);
 
     if (stats.isFile()) {
-      const m = require(`./modules/${file}`);
-
-      m(config, program)
-        .then(data => {
-          success(data);
-        })
-        .catch(err => {
-          error(err);
-          process.exit(1);
-        });
+      const mod = require(`./modules/${file}`);
+      mod(config, program);
     } else {
-      error(`[ERROR] ./modules/${file}.js is not a known file!`);
+      io.error(`./modules/${file}.js is not a known file!`);
       process.exit(1);
     }
   });
