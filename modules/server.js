@@ -1,5 +1,5 @@
-const io = require('../tools');
+const io = require('../io');
 
-module.exports = (config, program) => {
-  io.success('Server Settings have been stored!');
+module.exports = async (config, program) => {
+  return io.success('Server Settings have been stored!');
 };

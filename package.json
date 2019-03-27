@@ -1,6 +1,6 @@
 {
   "name": "unit3d_installer",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "UNIT3D Platform Installer",
   "main": "index.js",
   "scripts": {
@@ -9,10 +9,9 @@
   "author": "Poppabear",
   "license": "MIT",
   "dependencies": {
-    "await-spawn": "^2.1.2",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
-    "inquirer": "^6.2.2",
-    "lodash": "^4.17.11"
+    "figlet": "^1.2.1",
+    "inquirer": "^6.2.2"
   }
 }
