@@ -6,13 +6,17 @@ const figlet = require('figlet');
 const config = require('./config');
 const io = require('./io');
 
+/*
+ | Installer steps, Run the following modules in order from top to bottom.
+ | The values here should be the filename of the module in the modules directory excluding the .js
+ */
 const steps = [
   'properties',
   'utf8',
   'repositories',
   'packages',
   'composer',
-  // 'server',
+  'npm_packages',
 ];
 
 program

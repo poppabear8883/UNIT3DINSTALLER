@@ -11,7 +11,9 @@ module.exports = {
   ],
 
   'packages': [
+    'ufw',
     'debconf-utils',
+    'python-certbot-nginx',
     'php-pear',
     'php7.3-curl',
     'php7.3-dev',
@@ -54,11 +56,12 @@ module.exports = {
   /* Server */
   'server_name': '',
   'ip': '',
-  'hostname': '',
+  'fqdn': '',
   'ssl': true,
-  'owner': '',
+
+  'owner_username': '',
   'owner_email': '',
-  'password': '',
+  'owner_password': '',
 
   /* Database */
   'db': '',
