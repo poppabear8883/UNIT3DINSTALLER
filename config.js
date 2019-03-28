@@ -1,3 +1,7 @@
+/* todo: make sure every property in this file is validated through the properties module */
+
+const {ip, validatePassword} = require('./helpers');
+
 module.exports = {
   /* Main */
   'github': 'https://github.com/HDInnovations/UNIT3D.git',
@@ -8,6 +12,11 @@ module.exports = {
     'ppa:nginx/development',
     'ppa:ondrej/php',
     'ppa:certbot/certbot',
+  ],
+
+  /* These packages are installed GLOBALLY. */
+  'npm_packages': [
+    'laravel-echo-server',
   ],
 
   'packages': [
@@ -39,50 +48,242 @@ module.exports = {
     'htop',
   ],
 
-  /* Note: prepend with -g for a globally installed package */
-  'npm_packages': [
-    '-g laravel-echo-server',
-  ],
+  'questions': {
+    /* NOTE: The `name` properties of these objects MUST match the value in the stubs */
 
-  /*
-  | !STOP!
-  |
-  | The below items are used during the install,
-  | like default values and dynamically set values.
-  |
-  | If you are unsure what you should do below, just leave it alone !!
-  */
+    /* Server Questions */
+    'server': [
+      {
+        type: 'input',
+        name: 'server_name',
+        message: 'Server Name ?',
+        default () {
+          return 'UNIT3D SERVER';
+        },
+      },
+      {
+        type: 'input',
+        name: 'fqdn',
+        message: 'The FQDN for this server ?',
+        default (answers) {
+          return answers.server_name.replace(' ', '-').toLowerCase() + '.com';
+        },
+      },
+      {
+        type: 'input',
+        name: 'ip',
+        message: 'Primary IP Address ?',
+        default () {
+          return ip();
+        },
+      },
+      {
+        type: 'confirm',
+        name: 'ssl',
+        message: 'Use SSL (https) ?',
+        default: true,
+      },
+      {
+        type: 'input',
+        name: 'owner_username',
+        message: 'Owner Username ?',
+        default () {
+          return 'UNIT3D';
+        },
+      },
+      {
+        type: 'input',
+        name: 'owner_email',
+        message: 'Owners Email ?',
+        default (answers) {
+          return `${answers.owner_username}@${answers.fqdn}`;
+        },
+      },
+      {
+        type: 'password',
+        name: 'owner_password',
+        message: 'Owner Password ?',
+        mask: '*',
+        validate (input) {
+          return validatePassword(input);
+        },
+      },
+      {
+        type: 'password',
+        name: 'owner_password_confirm',
+        message: 'Confirm Owner Password ?',
+        mask: '*',
+        validate (input, answers) {
+          if (input !== answers.owner_password)
+            return 'Passwords do not match. Try again!';
 
-  /* Server */
-  'server_name': '',
-  'ip': '',
-  'fqdn': '',
-  'ssl': true,
+          return true;
+        },
+      },
+    ],
 
-  'owner_username': '',
-  'owner_email': '',
-  'owner_password': '',
+    /* Database Questions */
+    'database': [
+      {
+        type: 'input',
+        name: 'db_name',
+        message: 'Database Name ?',
+        default () {
+          return 'unit3d';
+        },
+      },
+      {
+        type: 'input',
+        name: 'db_user',
+        message: 'Database User ?',
+        default () {
+          return 'unit3d';
+        },
+      },
+      {
+        type: 'password',
+        name: 'db_pass',
+        message: 'Database Password ?',
+        mask: '*',
+        validate (input) {
+          return validatePassword(input);
+        },
+      },
+      {
+        type: 'password',
+        name: 'db_pass_confirm',
+        message: 'Confirm Database Password ?',
+        mask: '*',
+        validate (input, answers) {
+          if (input !== answers.db_pass)
+            return 'Passwords do not match. Try again!';
 
-  /* Database */
-  'db': '',
-  'dbuser': '',
-  'dbpass': '',
-  'dbrootpass': '',
+          return true;
+        },
+      },
+      {
+        type: 'password',
+        name: 'mysql_root_pass',
+        message: 'MySQL Root Password ?',
+        mask: '*',
+        validate (input) {
+          return validatePassword(input);
+        },
+      },
+      {
+        type: 'password',
+        name: 'mysql_root_pass_confirm',
+        message: 'Confirm MySQL Root Password ?',
+        mask: '*',
+        validate (input, answers) {
+          if (input !== answers.mysql_root_pass)
+            return 'Passwords do not match. Try again!';
 
-  /* Mail */
-  'mail_driver': 'smtp',
-  'mail_host': '',
-  'mail_port': '',
-  'mail_username': '',
-  'mail_password': '',
-  'mail_from_name': '',
+          return true;
+        },
+      },
+    ],
 
-  /* Chat */
-  'echo-port': '',
+    /* Mail Questions */
+    'mail': [
+      {
+        type: 'list',
+        message: 'Select Mail Driver',
+        name: 'mail_driver',
+        choices: [
+          'smtp',
+          'sendmail',
+          'mailgun',
+          'mandrill',
+          'ses',
+          'sparkpost',
+          'log',
+          'array',
+        ],
+      },
+      {
+        type: 'input',
+        name: 'mail_host',
+        message: 'Mail Host ?',
+        validate (input) {
+          if (input === '')
+            return 'Mail Host is required';
 
-  /* API Keys */
-  'tmdb-key': '',
-  'omdb-key': '',
-  'fanart-key': '',
-  'tvdb-key': '',
+          return true;
+        },
+      },
+      {
+        type: 'input',
+        name: 'mail_username',
+        message: 'Mail Username ?',
+        validate (input) {
+          if (input === '')
+            return 'Mail Username is required';
+
+          return true;
+        },
+      },
+      {
+        type: 'password',
+        name: 'mail_password',
+        message: 'Mail Password ?',
+        mask: '*',
+        validate (input) {
+          return validatePassword(input);
+        },
+      },
+      {
+        type: 'password',
+        name: 'mail_password_confirm',
+        message: 'Confirm Mail Password ?',
+        mask: '*',
+        validate (input, answers) {
+          if (input !== answers.mail_password)
+            return 'Passwords do not match. Try again!';
+
+          return true;
+        },
+      },
+      {
+        type: 'input',
+        name: 'mail_from',
+        message: 'Mail From ?',
+        validate (input) {
+          if (input === '')
+            return 'Mail From is required';
+
+          return true;
+        },
+      },
+    ],
+
+    /* Api Keys Questions */
+    'keys': [
+      {
+        type: 'input',
+        name: 'tmdb_key',
+        message: 'TMDB API Key ?',
+        validate (input) {
+          if (input.length !== 8)
+            return 'TMDB API Key should be exactly 8 characters long';
+
+          return true;
+        },
+      },
+      {
+        type: 'input',
+        name: 'omdb_key',
+        message: 'OMDB API Key ?',
+        validate (input) {
+          if (input.length !== 32)
+            return 'OMDB API Key should be exactly 32 characters long';
+
+          return true;
+        },
+      },
+    ],
+  },
+
+  /* Do Not Touch This */
+  'answers': {},
 };

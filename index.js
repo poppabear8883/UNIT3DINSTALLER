@@ -12,6 +12,7 @@ const io = require('./io');
  */
 const steps = [
   'properties',
+  'questions',
   'utf8',
   'repositories',
   'packages',
@@ -33,29 +34,16 @@ io.info(figlet.textSync('UNIT3D', {
 
 io.info(`Installer Version: v0.1.0`);
 
-io.ask([
-  {
-    type: 'confirm',
-    name: 'toContinue',
-    message: 'About to install software on your system, continue ?',
-    default: false,
-  },
-]).then(answers => {
-  if (answers.toContinue) {
-    steps.forEach(async (file, index) => {
-      if (program.debug) io.debug(`${file}.js: Index Pos: ${index}`);
-
-      try {
-        const mod = require(`./modules/${file}`);
-        await mod(config, program);
-      } catch (err) {
-        io.error(err);
-        process.exit(1);
-      }
-
-    });
+const run = async () => {
+  for (let file of steps) {
+    try {
+      const mod = require(`./modules/${file}`);
+      await mod(config, program);
+    } catch (err) {
+      io.error(err);
+      process.exit(1);
+    }
   }
-}).catch(err => {
-  io.error(err);
-  process.exit(1);
-});
+};
+
+run();

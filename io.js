@@ -33,7 +33,7 @@ function spawn (command, args, options = {}) {
   return child.stdout;
 }
 
-async function ask (questions) {
+function ask (questions) {
   return new Promise(async (resolve, reject) => {
     await inquirer.prompt(questions)
       .then(data => {
