@@ -4,7 +4,7 @@ const program = require('commander');
 const figlet = require('figlet');
 
 const config = require('./config');
-const io = require('./io');
+const io = require('./tools/io');
 
 /*
  | Installer steps, Run the following modules in order from top to bottom.

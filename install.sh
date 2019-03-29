@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export DEBIAN_FRONTEND=noninteractive
 
-source colors.sh
+source tools/colors.sh
 
 rm -rf /var/lib/dpkg/lock
 rm -rf /var/cache/debconf/*.*

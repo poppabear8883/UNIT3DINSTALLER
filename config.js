@@ -1,6 +1,6 @@
 /* todo: make sure every property in this file is validated through the properties module */
-const validate = require('./validator');
-const helper = require('./helpers');
+const validate = require('./tools/validators');
+const helper = require('./tools/helpers');
 
 module.exports = {
   /* Main */

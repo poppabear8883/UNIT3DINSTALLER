@@ -1,4 +1,4 @@
-const io = require('../io');
+const io = require('../tools/io');
 
 module.exports = async (config, program) => {
   io.header('Packages Module');
