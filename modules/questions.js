@@ -4,38 +4,23 @@ module.exports = async (config, program) => {
 
   io.header('Questions Module');
 
-  io.info('\n=== Server Questions ===');
-  await io.ask(config.questions.server).then(answers => {
-    /* Merge these answers into the configuration answers object */
-    Object.assign(config.answers, answers);
-  }).catch(err => {
-    io.error(err);
-    process.exit(1);
-  });
+  const questions = {
+    'Server': config.questions.server,
+    'Database': config.questions.database,
+    'Mail': config.questions.mail,
+    'Api': config.questions.keys,
+  };
 
-  io.info('\n=== Database Questions ===');
-  await io.ask(config.questions.database).then(answers => {
-    Object.assign(config.answers, answers);
-  }).catch(err => {
-    io.error(err);
-    process.exit(1);
-  });
-
-  io.info('\n=== Mail Questions ===');
-  await io.ask(config.questions.mail).then(answers => {
-    Object.assign(config.answers, answers);
-  }).catch(err => {
-    io.error(err);
-    process.exit(1);
-  });
-
-  io.info('\n=== Api Questions ===');
-  await io.ask(config.questions.keys).then(answers => {
-    Object.assign(config.answers, answers);
-  }).catch(err => {
-    io.error(err);
-    process.exit(1);
-  });
+  for (let item of Object.keys(questions)) {
+    io.info(`\n=== ${item} Questions ===`);
+    await io.ask(questions[item]).then(answers => {
+      /* Merge these answers into the configuration answers object */
+      Object.assign(config.answers, answers);
+    }).catch(err => {
+      io.error(err);
+      process.exit(1);
+    });
+  }
 
   if (program.debug) io.debug(JSON.stringify(config.answers, null, '  '));
 
