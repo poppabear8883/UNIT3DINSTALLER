@@ -57,28 +57,22 @@ module.exports = {
         type: 'input',
         name: 'server_name',
         message: 'Server Name ?',
-        default () {
-          return 'UNIT3D SERVER';
-        },
-        validate (input) { return validate.NotEmpty(input); }
+        default () { return 'UNIT3D-SERVER'; },
+        validate (input) { return validate.LimitSpecialChars(input); },
       },
       {
         type: 'input',
         name: 'fqdn',
         message: 'The FQDN for this server ?',
-        default (answers) {
-          return answers.server_name.replace(' ', '-').toLowerCase() + '.com';
-        },
-        validate (input) { return validate.NotEmpty(input); }
+        default (answers) { return answers.server_name.replace(' ', '-').toLowerCase() + '.com'; },
+        validate (input) { return validate.Domain(input); },
       },
       {
         type: 'input',
         name: 'ip',
         message: 'Primary IP Address ?',
-        default () {
-          return helper.ip();
-        },
-        validate (input) { return validate.NotEmpty(input); }
+        default () { return helper.ip(); },
+        validate (input) { return validate.Ip(input); },
       },
       {
         type: 'confirm',
@@ -90,39 +84,29 @@ module.exports = {
         type: 'input',
         name: 'owner_username',
         message: 'Owner Username ?',
-        default () {
-          return 'UNIT3D';
-        },
-        validate (input) { return validate.NotEmpty(input); }
+        default () { return 'UNIT3D'; },
+        validate (input) { return validate.LimitSpecialChars(input); },
       },
       {
         type: 'input',
         name: 'owner_email',
         message: 'Owners Email ?',
-        default (answers) {
-          return `${answers.owner_username.toLowerCase()}@${answers.fqdn}`;
-        },
-        validate (input) {
-          return validate.Email(input);
-        }
+        default (answers) { return `${answers.owner_username.toLowerCase()}@${answers.fqdn}`; },
+        validate (input) { return validate.Email(input); },
       },
       {
         type: 'password',
         name: 'owner_password',
         message: 'Owner Password ?',
         mask: '*',
-        validate (input) {
-          return validate.Password(input);
-        },
+        validate (input) { return validate.Password(input); },
       },
       {
         type: 'password',
         name: 'owner_password_confirm',
         message: 'Confirm Owner Password ?',
         mask: '*',
-        validate (input, answers) {
-          return validate.confirmPassword(input, answers.owner_password);
-        },
+        validate (input, answers) { return validate.confirmPassword(input, answers.owner_password); },
       },
     ],
 
@@ -132,55 +116,43 @@ module.exports = {
         type: 'input',
         name: 'db_name',
         message: 'Database Name ?',
-        default () {
-          return 'unit3d';
-        },
-        validate (input) { return validate.NotEmpty(input); }
+        default () { return 'unit3d'; },
+        validate (input) { return validate.LimitSpecialChars(input); },
       },
       {
         type: 'input',
         name: 'db_user',
         message: 'Database User ?',
-        default () {
-          return 'unit3d';
-        },
-        validate (input) { return validate.NotEmpty(input); }
+        default () { return 'unit3d'; },
+        validate (input) { return validate.LimitSpecialChars(input); },
       },
       {
         type: 'password',
         name: 'db_pass',
         message: 'Database Password ?',
         mask: '*',
-        validate (input) {
-          return validate.Password(input);
-        },
+        validate (input) { return validate.Password(input); },
       },
       {
         type: 'password',
         name: 'db_pass_confirm',
         message: 'Confirm Database Password ?',
         mask: '*',
-        validate (input, answers) {
-          return validate.confirmPassword(input, answers.db_pass);
-        },
+        validate (input, answers) { return validate.confirmPassword(input, answers.db_pass); },
       },
       {
         type: 'password',
         name: 'mysql_root_pass',
         message: 'MySQL Root Password ?',
         mask: '*',
-        validate (input) {
-          return validate.Password(input);
-        },
+        validate (input) { return validate.Password(input); },
       },
       {
         type: 'password',
         name: 'mysql_root_pass_confirm',
         message: 'Confirm MySQL Root Password ?',
         mask: '*',
-        validate (input, answers) {
-          return validate.confirmPassword(input, answers.mysql_root_pass);
-        },
+        validate (input, answers) { return validate.confirmPassword(input, answers.mysql_root_pass); },
       },
     ],
 
@@ -205,13 +177,13 @@ module.exports = {
         type: 'input',
         name: 'mail_host',
         message: 'Mail Host ?',
-        validate (input) { return validate.NotEmpty(input); }
+        validate (input) { return validate.Domain(input); },
       },
       {
         type: 'input',
         name: 'mail_username',
         message: 'Mail Username ?',
-        validate (input) { return validate.NotEmpty(input); }
+        validate (input) { return validate.LimitSpecialChars(input); },
       },
       {
         type: 'password',
@@ -235,7 +207,7 @@ module.exports = {
         type: 'input',
         name: 'mail_from',
         message: 'Mail From ?',
-        validate (input) { return validate.NotEmpty(input); }
+        validate (input) { return validate.NoSpecialChars(input); },
       },
     ],
 
@@ -245,23 +217,13 @@ module.exports = {
         type: 'input',
         name: 'tmdb_key',
         message: 'TMDB API Key ?',
-        validate (input) {
-          if (input.length !== 8)
-            return 'TMDB API Key should be exactly 8 characters long';
-
-          return true;
-        },
+        validate (input) { return validate.Length(input, 8); },
       },
       {
         type: 'input',
         name: 'omdb_key',
         message: 'OMDB API Key ?',
-        validate (input) {
-          if (input.length !== 32)
-            return 'OMDB API Key should be exactly 32 characters long';
-
-          return true;
-        },
+        validate (input) { return validate.Length(input, 32); },
       },
     ],
   },
