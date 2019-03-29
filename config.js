@@ -1,6 +1,6 @@
 /* todo: make sure every property in this file is validated through the properties module */
-
-const {ip, validatePassword} = require('./helpers');
+const validate = require('./validator');
+const helper = require('./helpers');
 
 module.exports = {
   /* Main */
@@ -60,6 +60,7 @@ module.exports = {
         default () {
           return 'UNIT3D SERVER';
         },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'input',
@@ -68,14 +69,16 @@ module.exports = {
         default (answers) {
           return answers.server_name.replace(' ', '-').toLowerCase() + '.com';
         },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'input',
         name: 'ip',
         message: 'Primary IP Address ?',
         default () {
-          return ip();
+          return helper.ip();
         },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'confirm',
@@ -90,14 +93,18 @@ module.exports = {
         default () {
           return 'UNIT3D';
         },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'input',
         name: 'owner_email',
         message: 'Owners Email ?',
         default (answers) {
-          return `${answers.owner_username}@${answers.fqdn}`;
+          return `${answers.owner_username.toLowerCase()}@${answers.fqdn}`;
         },
+        validate (input) {
+          return validate.Email(input);
+        }
       },
       {
         type: 'password',
@@ -105,7 +112,7 @@ module.exports = {
         message: 'Owner Password ?',
         mask: '*',
         validate (input) {
-          return validatePassword(input);
+          return validate.Password(input);
         },
       },
       {
@@ -114,10 +121,7 @@ module.exports = {
         message: 'Confirm Owner Password ?',
         mask: '*',
         validate (input, answers) {
-          if (input !== answers.owner_password)
-            return 'Passwords do not match. Try again!';
-
-          return true;
+          return validate.confirmPassword(input, answers.owner_password);
         },
       },
     ],
@@ -131,6 +135,7 @@ module.exports = {
         default () {
           return 'unit3d';
         },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'input',
@@ -139,6 +144,7 @@ module.exports = {
         default () {
           return 'unit3d';
         },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'password',
@@ -146,7 +152,7 @@ module.exports = {
         message: 'Database Password ?',
         mask: '*',
         validate (input) {
-          return validatePassword(input);
+          return validate.Password(input);
         },
       },
       {
@@ -155,10 +161,7 @@ module.exports = {
         message: 'Confirm Database Password ?',
         mask: '*',
         validate (input, answers) {
-          if (input !== answers.db_pass)
-            return 'Passwords do not match. Try again!';
-
-          return true;
+          return validate.confirmPassword(input, answers.db_pass);
         },
       },
       {
@@ -167,7 +170,7 @@ module.exports = {
         message: 'MySQL Root Password ?',
         mask: '*',
         validate (input) {
-          return validatePassword(input);
+          return validate.Password(input);
         },
       },
       {
@@ -176,10 +179,7 @@ module.exports = {
         message: 'Confirm MySQL Root Password ?',
         mask: '*',
         validate (input, answers) {
-          if (input !== answers.mysql_root_pass)
-            return 'Passwords do not match. Try again!';
-
-          return true;
+          return validate.confirmPassword(input, answers.mysql_root_pass);
         },
       },
     ],
@@ -205,23 +205,13 @@ module.exports = {
         type: 'input',
         name: 'mail_host',
         message: 'Mail Host ?',
-        validate (input) {
-          if (input === '')
-            return 'Mail Host is required';
-
-          return true;
-        },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'input',
         name: 'mail_username',
         message: 'Mail Username ?',
-        validate (input) {
-          if (input === '')
-            return 'Mail Username is required';
-
-          return true;
-        },
+        validate (input) { return validate.NotEmpty(input); }
       },
       {
         type: 'password',
@@ -229,7 +219,7 @@ module.exports = {
         message: 'Mail Password ?',
         mask: '*',
         validate (input) {
-          return validatePassword(input);
+          return validate.Password(input);
         },
       },
       {
@@ -238,22 +228,14 @@ module.exports = {
         message: 'Confirm Mail Password ?',
         mask: '*',
         validate (input, answers) {
-          if (input !== answers.mail_password)
-            return 'Passwords do not match. Try again!';
-
-          return true;
+          return validate.confirmPassword(input, answers.mail_password);
         },
       },
       {
         type: 'input',
         name: 'mail_from',
         message: 'Mail From ?',
-        validate (input) {
-          if (input === '')
-            return 'Mail From is required';
-
-          return true;
-        },
+        validate (input) { return validate.NotEmpty(input); }
       },
     ],
 

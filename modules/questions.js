@@ -37,6 +37,8 @@ module.exports = async (config, program) => {
     process.exit(1);
   });
 
+  if (program.debug) io.debug(JSON.stringify(config.answers, null, '  '));
+
   io.info('\n=== Confirm ===');
   await io.ask([
     {
