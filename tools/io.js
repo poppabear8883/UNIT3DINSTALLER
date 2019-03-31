@@ -15,7 +15,7 @@ const header = (message) => {
   console.log(chalk.magenta('='.repeat(18 + message.length)));
 };
 
-function spawn (command, args, options = {}) {
+function spawn (command, args = [], options = {}) {
   const child = spawnSync(command, args, options);
 
   if (child.status !== null && child.status !== 0) {

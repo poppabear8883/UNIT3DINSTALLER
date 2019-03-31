@@ -18,6 +18,7 @@ const steps = [
   'packages',
   'composer',
   'npm_packages',
+  'mysql'
 ];
 
 program

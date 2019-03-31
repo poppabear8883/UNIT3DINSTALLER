@@ -7,6 +7,7 @@ module.exports = {
   'github': 'https://github.com/HDInnovations/UNIT3D.git',
   'web-user': 'www-data',
   'install_dir': '/var/www/html',
+  'mysql_dir': '/etc/mysql',
 
   'repositories': [
     'ppa:nginx/development',
@@ -217,12 +218,14 @@ module.exports = {
         type: 'input',
         name: 'tmdb_key',
         message: 'TMDB API Key ?',
+        default () { return '12345678'; }, // todo: remove after release
         validate (input) { return validate.Length(input, 8); },
       },
       {
         type: 'input',
         name: 'omdb_key',
         message: 'OMDB API Key ?',
+        default () { return '12345678901234567890123456789012'; }, // todo: remove after release
         validate (input) { return validate.Length(input, 32); },
       },
     ],
