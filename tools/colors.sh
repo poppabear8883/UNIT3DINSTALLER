@@ -85,3 +85,7 @@ success() {
 info() {
     echo -e "$Cyan $1 $Color_Off\n"
 }
+
+warning() {
+    echo -e "$Yellow $1 $Color_Off\n"
+}
