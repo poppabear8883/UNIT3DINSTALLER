@@ -10,7 +10,15 @@ echo -e "\n"
 header "Preparing Environment For The Installer"
 
 info "Updating Packages ..."
-apt-get -qq update
+update=`apt-get -qq update 2>&1`
+if [[ $update == *" NO_PUBKEY "* ]]; then
+    key=`echo "$update" | cut -d " " -f 21`
+    if [[ ${#key} -gt 1 ]]; then
+        warning "Adding ${key} to keyserver ..."
+        addKey=`gpg --keyserver keyserver.ubuntu.com --recv ${key} && gpg --export --armor ${key} 2>&1 | sudo apt-key add -`
+        warning ${addKey}
+    fi
+fi
 success "OK"
 
 info "Installing NodeJS ..."
