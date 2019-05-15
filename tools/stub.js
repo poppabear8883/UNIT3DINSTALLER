@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 module.exports.ReadFile = (source) => {
-  return fs.readFileSync(`../resources/${source}`, 'utf8');
+  return fs.readFileSync(`./resources/${source}`, 'utf8');
 };
 
 module.exports.WriteFile = (path, source) => {
@@ -20,7 +20,7 @@ module.exports.Replace = (replace, source) => {
 
   for (const key in Object.keys(replace)) {
     const _key = `\{\{${key}\}\}`;
-    _source = source.replace(_key, replace[i]);
+    _source = source.replace(_key, replace[key]);
   }
 
   return _source;

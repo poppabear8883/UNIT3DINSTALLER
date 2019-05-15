@@ -7,7 +7,7 @@ module.exports = async (config, program) => {
 
   io.header('MySQL Module');
 
-  const dist = distVersion().toString();
+  const dist = distVersion();
   const mysql_root_pass = config.answers.mysql_root_pass;
   const db_name = config.answers.db_name;
   const db_user = config.answers.db_user;
@@ -37,14 +37,17 @@ module.exports = async (config, program) => {
     if (program.debug) io.debug(data);
   }
 
-  if (dist.includes('18.04') && !fs.lstatSync('/var/lib/mysql').isDirectory()) {
+  if (dist.includes('18.04')) {
+    io.info('Securing MySQL ...');
     // I am assuming that the fs library will be faster and more reliable then spawning a child process.
     // So, I would love to use it where I can.
-    fs.mkdirSync('/var/lib/mysql');
+    if (!fs.lstatSync('/var/lib/mysql').isDirectory()) {
+      fs.mkdirSync('/var/lib/mysql');
+    }
+
     // fs.chownSync(path, uid, gid) todo: how to effectively get the integer value of the mysql:mysql uid:gid ??
     io.spawn('chown', ['mysql:mysql', '/var/lib/mysql']); // todo: Remove IF we resolve the above line!
 
-    io.info('Securing MySQL ...');
     const data = io.spawn('mysqld', [' --initialize-insecure']);
     if (program.debug) io.debug(data);
   }
@@ -65,39 +68,34 @@ module.exports = async (config, program) => {
   }
 
   io.info('Running "update-rc.d" ...');
-  program.debug ?
-    io.debug(io.spawn('update-rc.d', ['mysql', 'defaults'])) :
-    io.spawn('update-rc.d', ['mysql', 'defaults']);
+  io.spawn('update-rc.d', ['mysql', 'defaults']);
 
   io.info('Starting mysql service ...');
-  program.debug ?
-    io.debug(io.spawn('service', ['mysql', 'start'])) :
-    io.spawn('service', ['mysql', 'start']);
+  io.spawn('service', ['mysql', 'start']);
 
   io.info('Running "mysqladmin" ...');
-  program.debug ?
-    io.debug(io.spawn('mysqladmin', ['-u', 'root', 'password', mysql_root_pass])) :
-    io.spawn('mysqladmin', ['-u', 'root', 'password', mysql_root_pass]);
+  io.spawn('mysqladmin', ['-u', 'root', 'password', mysql_root_pass]);
 
+  io.info('Setting permissions on "/root/.my.cnf" ...');
   fs.chmod('/root/.my.cnf', 600);
 
   const mysqlCmds = [
-    `"DROP USER IF EXISTS ${db_user}"`,
-    `"DROP DATABASE IF EXISTS ${db_name}"`,
-    `"CREATE DATABASE ${db_name}"`,
-    `"CREATE USER '${db_user}'@'localhost' IDENTIFIED BY '${db_pass}';"`,
-    `"GRANT ALL PRIVILEGES ON ${db_name} . * TO '${db_user}'@'localhost'"`,
-    `"UPDATE mysql.user SET authentication_string=PASSWORD('${mysql_root_pass}') WHERE User='root'"`,
-    `"DELETE FROM mysql.user WHERE User=''"`,
-    `"DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')"`,
-    `"DROP DATABASE test"`,
-    `"DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"`,
-    `"FLUSH PRIVILEGES"`,
+    `DROP USER IF EXISTS '${db_user}'@'localhost'`,
+    `DROP DATABASE IF EXISTS ${db_name}`,
+    `CREATE DATABASE ${db_name}`,
+    `CREATE USER '${db_user}'@'localhost' IDENTIFIED BY '${db_pass}'`,
+    `GRANT ALL PRIVILEGES ON ${db_name} . * TO '${db_user}'@'localhost'`,
+    `UPDATE mysql.user SET authentication_string=PASSWORD('${mysql_root_pass}') WHERE User='root'`,
+      `DELETE FROM mysql.user WHERE User=''`,
+      `DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')`,
+    `DROP DATABASE IF EXISTS test`,
+      `DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'`,
+    `FLUSH PRIVILEGES`,
   ];
 
   for (const cmd of mysqlCmds) {
-    const data = io.spawn('mysql', ['-e', cmd]);
-    if (program.debug) io.debug(data);
+    if (program.debug) io.debug(`Executing "${cmd}" ...`);
+    io.spawn('mysql', ['-e', cmd]);
   }
 
   return io.success('MySQL Module Completed Successfully');

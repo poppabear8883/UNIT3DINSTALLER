@@ -1,16 +1,18 @@
 const os = require('os');
 const io = require('./io');
 
-module.exports.ip = async () => {
+module.exports.ip = () => {
   const data = io.spawn('hostname', ['-I']);
-  return data.toString().split(' ')[0].trim();
+  return data.split(' ')[0].trim();
 };
 
-module.exports.distVersion = async () => {
-  const data = io.spawn('sh', ['-c', 'head -n1 /etc/issue | cut -f 2 -d \' \'']);
-  return data.toString();
+module.exports.distVersion = () => {
+  return io.spawn('cut', ['-f2', '-d', ' '], {
+    input: io.spawn('head', ['-n1', '/etc/issue'])
+  });
+
 };
 
-module.exports.totalMemory = async () => {
+module.exports.totalMemory = () => {
   return os.totalmem();
 };

@@ -30,7 +30,7 @@ function spawn (command, args = [], options = {}) {
     process.exit(child.status);
   }
 
-  return child.stdout;
+  return child.stdout ? child.stdout.toString().trim() : '';
 }
 
 function ask (questions) {

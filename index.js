@@ -1,5 +1,4 @@
 'use strict';
-const fs = require('fs');
 const program = require('commander');
 const figlet = require('figlet');
 
@@ -46,6 +45,9 @@ const run = async () => {
       process.exit(1);
     }
   }
+
+  return true;
 };
 
 run();
+
