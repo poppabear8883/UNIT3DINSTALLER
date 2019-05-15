@@ -37,18 +37,14 @@ module.exports = async (config, program) => {
     if (program.debug) io.debug(data);
   }
 
+  io.info('Setting permissions ...');
+  io.spawn('chown', ['mysql:mysql', '/etc/mysql/my.cnf']);
+  io.spawn('chown', ['mysql:mysql', '/var/lib/mysql']);
+  fs.chmod('/etc/mysql/my.cnf', 600);
+
   if (dist.includes('18.04')) {
     io.info('Securing MySQL ...');
-    // I am assuming that the fs library will be faster and more reliable then spawning a child process.
-    // So, I would love to use it where I can.
-    if (!fs.lstatSync('/var/lib/mysql').isDirectory()) {
-      fs.mkdirSync('/var/lib/mysql');
-    }
-
-    // fs.chownSync(path, uid, gid) todo: how to effectively get the integer value of the mysql:mysql uid:gid ??
-    io.spawn('chown', ['mysql:mysql', '/var/lib/mysql']); // todo: Remove IF we resolve the above line!
-
-    const data = io.spawn('mysqld', [' --initialize-insecure']);
+    const data = io.spawn('mysqld', ['--initialize-insecure', '--explicit_defaults_for_timestamp']);
     if (program.debug) io.debug(data);
   }
 
@@ -86,10 +82,18 @@ module.exports = async (config, program) => {
     `CREATE USER '${db_user}'@'localhost' IDENTIFIED BY '${db_pass}'`,
     `GRANT ALL PRIVILEGES ON ${db_name} . * TO '${db_user}'@'localhost'`,
     `UPDATE mysql.user SET authentication_string=PASSWORD('${mysql_root_pass}') WHERE User='root'`,
-      `DELETE FROM mysql.user WHERE User=''`,
-      `DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')`,
+      `DELETE
+       FROM mysql.user
+       WHERE User = ''`,
+      `DELETE
+       FROM mysql.user
+       WHERE User = 'root'
+         AND Host NOT IN ('localhost', '127.0.0.1', '::1')`,
     `DROP DATABASE IF EXISTS test`,
-      `DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'`,
+      `DELETE
+       FROM mysql.db
+       WHERE Db = 'test'
+          OR Db = 'test\\_%'`,
     `FLUSH PRIVILEGES`,
   ];
 
